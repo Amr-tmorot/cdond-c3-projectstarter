@@ -139,9 +139,9 @@ jobs:
       - checkout
       # - attach_workspace:
       #     at: ~/
-      # - run:
-      #     name: Install dependencies
-      #     command: yum install -y tar gzip
+      - run:
+          name: Install dependencies
+          command: yum install -y tar gzip
       # - run:
       #     name: Ensure back-end infrastructure exists
       #     command: |
@@ -370,7 +370,7 @@ workflows:
           #   branches:
           #     only: [test-feature-branch]
       - configure-infrastructure
-      #     requires: [deploy-infrastructure]
+           requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
