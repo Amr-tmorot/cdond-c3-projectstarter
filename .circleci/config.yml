@@ -142,101 +142,94 @@ jobs:
       - run:
           name: Install dependencies
           command: yum install -y tar gzip
-      # - run:
-      #     name: Ensure back-end infrastructure exists
-      #     command: |
-      #       aws cloudformation deploy \
-      #           --template-file .circleci/files/backend.yml \
-      #           --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-      #           --tags project=udapeople
-      #       #exit 1
-      # - run:
-      #     name: Ensure front-end infrastructure exist
-      #     command: |
-      #       aws cloudformation deploy \
-      #           --template-file .circleci/files/frontend.yml \
-      #           --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #           --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-      #           --tags project=udapeople
-      # - run:
-      #     name: Add back-end ip to ansible inventory
-      #     command: |
-      #       # Save the ip
-      #       backendip=$(aws cloudformation \
-      #         list-exports --query "Exports[?Name==\`backendIP\`].Value" \
-      #         --no-paginate --output text)
-      #       echo "$backendip"
-      #       echo "$backendip" >> .circleci/ansible/inventory.txt
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+                --template-file .circleci/files/backend.yml \
+                --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+                --tags project=udapeople
+            #exit 1
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+                --template-file .circleci/files/frontend.yml \
+                --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+                --tags project=udapeople
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            # Save the ip
+            backendip=$(aws cloudformation \
+              list-exports --query "Exports[?Name==\`backendIP\`].Value" \
+              --no-paginate --output text)
+            echo "$backendip"
+            echo "$backendip" >> .circleci/ansible/inventory.txt
 
 
-      # - run:
-      #     name: Ensure inventory saved
-      #     command: |
-      #       cat .circleci/ansible/inventory.txt
+      - run:
+          name: Ensure inventory saved
+          command: |
+            cat .circleci/ansible/inventory.txt
 
       - persist_to_workspace:
           root: .circleci
           paths:
             - ansible/inventory.txt
       #Here's where you will add some code to rollback on failure      
-      # - destroy-environment:
+      - destroy-environment:
       #     workflow_id: "b0dad36"
 
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11
     steps:
-  #     - checkout
-        - attach_workspace:
-            at: ~/
-        - run:
-            name: test workspace
-            command: |
-              ls ~/project
-  #     - add_ssh_keys:
-  #         fingerprints: ["c2:67:e2:1f:cb:da:c8:c7:74:3d:07:22:ce:57:cf:46"]
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Ensure inventory loaded
-  #         command: |
+       - checkout
+        # - attach_workspace:
+        #     at: ~/
+        # - run:
+        #     name: test workspace
+        #     command: |
+        #       ls ~/project
+      - add_ssh_keys:
+          fingerprints: ["c2:67:e2:1f:cb:da:c8:c7:74:3d:07:22:ce:57:cf:46"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Ensure inventory loaded
+          command: |
+
+            cat ~/ansible/inventory.txt
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible && apk add openssh
   #           ls
-  #           ls ~/
-  #           pwd
-  #           apk add curl
-  #           cat ~/project/.circleci/ansible/inventory.txt
-  #           export BACKEND_IP=$(curl -H "token: HazemZein" --request GET \
-  #           https://api.memstash.io/values/ec2_back_ip_${CIRCLE_WORKFLOW_ID})
-  #           echo "${BACKEND_IP}"  >> .circleci/ansible/inventory.txt
-  #           cat .circleci/ansible/inventory.txt
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add --update ansible && apk add openssh
-  #           ls
-  #     - run:
-  #         name: Set global vars
-  #         command: |
-  #           echo ENVIRONMENT=production > "backend/.env"
-  #           echo TYPEORM_CONNECTION=postgres >> "backend/.env"
-  #           echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
-  #           echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
-  #           echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
-  #           echo NODE_ENV=production >> "backend/.env"
-  #           echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
-  #           echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
-  #           echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
-  #           echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
-  #           echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
+      - run:
+          name: Set global vars
+          command: |
+            echo ENVIRONMENT=production > "backend/.env"
+            echo TYPEORM_CONNECTION=postgres >> "backend/.env"
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> "backend/.env"
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> "backend/.env"
+            echo NODE_ENV=production >> "backend/.env"
+            echo TYPEORM_HOST=$TYPEORM_HOST >> "backend/.env"
+            echo TYPEORM_PORT=$TYPEORM_PORT >> "backend/.env"
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> "backend/.env"
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> "backend/.env"
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> "backend/.env"
+      - run:
+          name: Configure server
+          command: |
+            ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ~/.circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
       
             
   #     # Here's where you will add some code to rollback on failure
-  #     - destroy-environment      
+       - destroy-environment      
 
 #   run-migrations:
 #     docker:
