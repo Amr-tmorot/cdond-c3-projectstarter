@@ -181,7 +181,7 @@ jobs:
       #       - ansible/inventory.txt
       #Here's where you will add some code to rollback on failure      
       - destroy-environment:
-           workflow_id: "c6d1281"
+            workflow_id: "c6d1281"
 
   configure-infrastructure:
     docker:
