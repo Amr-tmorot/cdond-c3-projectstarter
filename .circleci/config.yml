@@ -340,7 +340,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            apk add --update curl nodejs npm
+            apk add --update curl nodejs npm busybox-extras
             pip install awscli
       - run:
           name: Backend smoke test.
@@ -350,6 +350,7 @@ jobs:
               --no-paginate --output text)
             echo $BACKEND_IP
             echo "http://$BACKEND_IP:3030/api/status"
+            busybox-extras telnet $BACKEND_IP 3030
             if curl "${BACKEND_IP}:3030/api/status" | grep "ok"
             then
                 return 0
