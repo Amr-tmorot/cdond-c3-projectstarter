@@ -24,7 +24,7 @@
   become_user: ubuntu
   become: yes
   unarchive:
-    src: backend.tar
+    src: ~/backend.tar
     dest: ~/app
 
 - name: "start PM2"
