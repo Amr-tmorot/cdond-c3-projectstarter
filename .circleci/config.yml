@@ -320,6 +320,7 @@ jobs:
             cd backend
             npm i
             npm run build
+            npm run prestart:prod
             cd ..
             echo "Contents  of the inventory.txt file is -------"
             cat ~/ansible/inventory.txt
